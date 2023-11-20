@@ -1,6 +1,7 @@
 package player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import cards.*;
 
@@ -25,8 +26,11 @@ public class Player {
     }
 
     public void takeDamage(int amountOfDamage){
-        health = amountOfDamage;
+        // Bug fix: Take damage
+        health -= amountOfDamage;
     }
+
+
 
     public boolean getAttackingStatus(){
         return attackingStatus;
@@ -41,7 +45,8 @@ public class Player {
     }
 
     public void resetDamage(){
-        damage = damage;
+        // Bug fix: Reset damage
+        damage = 0;
     }
 
     public int getHealth() {
@@ -65,7 +70,8 @@ public class Player {
     }
 
     public void shuffleDeck() {
-        return;
+        // Bug fix: Non-random order of cards
+        Collections.shuffle(this.deck);
     }
 
     public void populateDeck(List<Card> cardList) {
@@ -81,8 +87,15 @@ public class Player {
     }
 
     public void drawCard() {
+        // Bug fix: Draw card from an empty deck
+
+        if(!deck.isEmpty()){
             Card drawnCard = deck.remove(deck.size() - 1);
-            hand.add(drawnCard); 
+            hand.add(drawnCard);
+        }
+        else{
+            System.out.println("Deck is empty, play with remaining cards.");
+        }
     }
 
     public void drawInitialCards() {
@@ -99,8 +112,14 @@ public class Player {
                 break;
             }
         }
+        //Bug fix: Player tries to play card he doesn't have
+        try {
             hand.remove(cardToPlay);
             cardToPlay.effect();
+        } catch (Exception e) {
+            System.out.println("\nYou cannot play card you don't have in hand, please chose another card from hand\n");
+        }
+
          
             lastPlayedCard = cardToPlay;
 
@@ -109,10 +128,11 @@ public class Player {
                 damage += cardToPlay.getNumber();
             }
             if(cardToPlay instanceof BoostAttackCard){
-                attackingStatus = true;
+                //Bug fix: Player can attack with boost card
+                attackingStatus = false;
                 damage += ((BoostAttackCard)cardToPlay).getBoost();
             }
-        
+
        
     }
 
@@ -124,10 +144,15 @@ public class Player {
                 break;
             }
         }
+        // Bug fix: Opponent can not be attacked with the same card which special ability is used for deflecting the attack
+        hand.remove(cardToPlay);
 
         if(cardToPlay != null){
+
             lastPlayedCard = cardToPlay;
-            attackingStatus = true;
+            //Bug fix: After using special ability of the Attack card, player is attacking
+            attackingStatus=false;
+
 
             System.out.println(String.format("You've defended yourself! You've been attacked for %d damage and you've used special ability of Attacking card %d to deflect the attack\r\n", cardNumber, cardNumber));
         }
@@ -138,6 +163,7 @@ public class Player {
 
     public boolean checkForProtectionPossibilitiesInHand(Card lastPlayedCard){
         for (Card card : hand) {
+
             if (card instanceof ProtectCard || card.getNumber() == lastPlayedCard.getNumber()) {
                 return true;
             }
@@ -145,14 +171,15 @@ public class Player {
         return false;
     }
 
+    //Bug fix: when we have that card in hand, return true
     public boolean findNumberInHand(int number){
         for(Card card : hand){
             if(card.getNumber() == number){
-                return false;
+                return true;
             }
         }
         System.out.println(String.format("There is no card in hand with number %d\r\n", number));
-        return true;
+        return false;
     }
 
     public void printHand() {

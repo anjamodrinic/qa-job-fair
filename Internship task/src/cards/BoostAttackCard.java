@@ -4,6 +4,7 @@ public class BoostAttackCard implements Card{
     private int number;
     private static  int boost = 3;
 
+
     public BoostAttackCard(){
         this.number = 2;
     }
@@ -13,8 +14,9 @@ public class BoostAttackCard implements Card{
         return number;
     }
 
+    // Bug fix: getBoost should return boost
     public int getBoost(){
-        return number;
+        return boost;
     }
 
     @Override

@@ -1,6 +1,8 @@
 package game;
 
 import java.util.Scanner;
+
+import cards.AttackCard;
 import player.*;
 
 
@@ -25,14 +27,19 @@ public class Game {
         return isHandEmpty(player) && player.getDeck().isEmpty();
     }
 
+    // Bug fix: game continues when health<0
     private boolean hasHealth(Player player){
-        return player.getHealth() != 0;
+        return player.getHealth() > 0;
     }
 
     private boolean isHandEmpty(Player player){
         return player.getHand().isEmpty();
     }
 
+
+    public boolean testCommandIsPlayerWithoutOptionsToPlay() {
+        return isPlayerWithoutOptionsToPlay(player1);
+    }
     public void startGame() {
         // Draw initial cards for both players
         player1.drawInitialCards();
@@ -74,6 +81,31 @@ public class Game {
         }
     }
 
+    public boolean testCommandPlayTurn(Player currentPlayer, Player opponentPlayer) {
+
+        currentPlayer.drawCard();
+        System.out.println("Health: " + currentPlayer.getHealth() + "\r\n");
+        currentPlayer.resetAttackingStatus();
+        currentPlayer.resetDamage();
+
+        if (opponentPlayer.getAttackingStatus()) {
+            currentPlayer.printHand();
+            currentPlayerUnderAttack(currentPlayer, opponentPlayer);
+            if (isHandEmpty(currentPlayer) || !hasHealth(currentPlayer)) {
+                return false;
+            } else return true;
+        }
+
+
+            if (isHandEmpty(currentPlayer) || (currentPlayer.getLastPlayedCard() instanceof AttackCard)) {
+                return false;
+            } else return true;
+
+
+    }
+
+
+
     private void playTurn(Player currentPlayer, Player opponentPlayer) {
         currentPlayer.drawCard();
         System.out.println("Health: " + currentPlayer.getHealth() + "\r\n");
@@ -101,7 +133,9 @@ public class Game {
                     int cardNumber = Integer.parseInt(input);
                     currentPlayer.playCard(cardNumber);
                     //check if player can play anything else
-                    if(isHandEmpty(currentPlayer)){
+
+                //Bug fix: Player's turn continue after playing attackCard
+                    if(isHandEmpty(currentPlayer)|| (currentPlayer.getLastPlayedCard() instanceof AttackCard)){
                         break;
                     }
             } catch (NumberFormatException e) {
@@ -150,9 +184,13 @@ public class Game {
         String input;
     
         do {
+
             input = scanner.nextLine();
-        } while (!input.equalsIgnoreCase("take") && !input.equals("1") && !(input.equals(Integer.toString(opponentDamage)) && currentPlayer.findNumberInHand(Integer.parseInt(input))));
-    
+            //Bug fix:
+        } while (!input.equalsIgnoreCase("take") && !input.equals("1") &&
+                !(input.equals(Integer.toString(opponentDamage)) &&
+                currentPlayer.findNumberInHand(Integer.parseInt(input))));
+
         return input;
     }
     
