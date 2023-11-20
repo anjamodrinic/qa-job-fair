@@ -81,7 +81,7 @@ public class Game {
         }
     }
 
-    public boolean testCommandPlayTurn(Player currentPlayer, Player opponentPlayer) {
+    public boolean testCommandIsPlayers1Turn(Player currentPlayer, Player opponentPlayer) {
 
         currentPlayer.drawCard();
         System.out.println("Health: " + currentPlayer.getHealth() + "\r\n");

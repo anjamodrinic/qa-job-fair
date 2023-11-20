@@ -1,6 +1,7 @@
 package test;
 
 import cards.AttackCard;
+import cards.BoostAttackCard;
 import cards.Card;
 import game.Game;
 import org.junit.Assert;
@@ -9,6 +10,7 @@ import player.Player;
 import utility.Utility;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -46,20 +48,18 @@ public class TestGame {
         Player player2 = new Player(20, Utility.generateCards());
         Game game = new Game(player1, player2);
 
-        // Add an AttackCard to player1's hand
-        AttackCard attackCard = new AttackCard(5); // Assuming '5' is the attack value
+
+        AttackCard attackCard = new AttackCard(5);
         player1.getHand().add(attackCard);
 
         // Before playing the card
         int initialAttackDamage = player1.getDamage();
-        boolean initialTurnStatus = game.testCommandPlayTurn(player1,player2); // Assuming isPlayerTurn() checks if it's player1's turn
-
+        boolean initialTurnStatus = game.testCommandIsPlayers1Turn(player1,player2);
 
         player1.playCard(attackCard.getNumber());
-
-        // After playing the card
+        //after playimg the card
         int newAttackDamage = player1.getDamage();
-        boolean newTurnStatus = game.testCommandPlayTurn(player1,player2);
+        boolean newTurnStatus = game.testCommandIsPlayers1Turn(player1,player2);
 
         // Check if attack damage increased
         assertTrue(newAttackDamage > initialAttackDamage);
@@ -67,5 +67,7 @@ public class TestGame {
         // Check if the turn has ended
         assertFalse(newTurnStatus);
     }
+
+
 
 }
